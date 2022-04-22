@@ -14,10 +14,13 @@ class VideoInfo extends StatefulWidget {
 
 class _VideoInfoState extends State<VideoInfo> {
 
-  List info=[];
-  _initData(){
-    DefaultAssetBundle.of(context).loadString("json/videoinfo.json").then((value){
-      info = json.decode(value);
+  List videoinfo=[];
+  bool _playArea=false;
+  _initData() async {
+    await DefaultAssetBundle.of(context).loadString("json/videoinfo.json").then((value){
+      setState(() {
+        videoinfo = json.decode(value);
+      });
     });
   }
   @override
@@ -161,7 +164,7 @@ class _VideoInfoState extends State<VideoInfo> {
                 ),
                 child: Column(
                   children: [
-                    SizedBox(height: 20,),
+                    SizedBox(height: 30,),
                     Row(
                       children: [
                         SizedBox(width: 30,),
@@ -186,6 +189,8 @@ class _VideoInfoState extends State<VideoInfo> {
                         SizedBox(width: 20,),
                       ],
                     ),
+                    SizedBox(height: 20,),
+                    Expanded(child: _listView(),),
                   ],
                 ),
               ),
@@ -193,6 +198,114 @@ class _VideoInfoState extends State<VideoInfo> {
             ],
           ),
         ),
+    );
+  }
+
+  _listView(){
+    return ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8,),
+        itemCount: videoinfo.length,
+        itemBuilder: (_, int index){
+          return GestureDetector(
+            onTap: (){
+              debugPrint(index.toString());
+              setState(() {
+                if(_playArea==false){
+                  _playArea=true;
+                }
+              });
+            },
+            child: _buildCard(index),
+          );
+        });
+  }
+  _buildCard(int index) {
+    return Container(
+      height: 140,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  image: DecorationImage(
+                    image: AssetImage(
+                        videoinfo[index]["thumbnail"]
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              SizedBox(width: 10,),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    videoinfo[index]["title"],
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10,),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3.0,),
+                    child: Text(
+                      videoinfo[index]["time"],
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 20,),
+          Row(
+            children: [
+              Container(
+                width: 80,
+                height: 20,
+                decoration: BoxDecoration(
+                    color: Color(0xFFeaeefc),
+                    borderRadius: BorderRadius.circular(10)
+                ),
+                child: Center(
+                  child: Text(
+                    "15s rest",
+                    style: TextStyle(
+                      color: Color(0xFF839fed),
+                    ),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  for(int i=0; i<70; i++)
+                    i.isEven?Container(
+                      width: 3,
+                      height: 1,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF839fed),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ):Container(
+                      width: 3,
+                      height: 1,
+                      color: Colors.white,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 } 
